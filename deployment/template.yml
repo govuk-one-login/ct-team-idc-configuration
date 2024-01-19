@@ -39,7 +39,7 @@ Resources:
     Properties:
       ServiceToken: !GetAtt 'TriggerBuildLambda.Arn'
       appId: !GetAtt AmplifyApp.AppId
-      branchName: main
+      branchName: !Ref branchName
       branch: !GetAtt AmplifyBranch.Arn
 
   AmplifyRole:
