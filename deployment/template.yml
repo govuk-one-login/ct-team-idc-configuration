@@ -26,9 +26,6 @@ Parameters:
   teamAccount:
     Type: String
     Description: TEAM deployment account ID
-  branchName:
-    Type: String
-    Description: Amplify source branch
 
 Conditions:
   IsEmptyCloudTrailAuditLogs: !Equals [!Ref CloudTrailAuditLogs, ""]
@@ -120,7 +117,7 @@ Resources:
   AmplifyBranch:
     Type: AWS::Amplify::Branch
     Properties:
-      BranchName: !Ref branchName
+      BranchName: main
       AppId: !GetAtt AmplifyApp.AppId
       EnableAutoBuild: true
       EnvironmentVariables: 
@@ -141,7 +138,7 @@ Resources:
           Value: !Ref tags
       Tags:
         - Key: Branch
-          Value: !Ref branchName
+          Value: main
   
   TriggerBuildLambda:
     Type: AWS::Lambda::Function
