@@ -221,13 +221,12 @@
         }
       }
     },
-    "lambdaexecutionpolicy": {
+    "LambdaExecutionPolicy": {
       "DependsOn": [
         "LambdaExecutionRole"
       ],
-      "Type": "AWS::IAM::Policy",
+      "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
-        "PolicyName": "lambda-execution-policy",
         "Roles": [
           {
             "Ref": "LambdaExecutionRole"
@@ -308,13 +307,12 @@
         }
       }
     },
-    "LambdaTriggerPolicyrequests": {
+    "AmplifyLambdaExecutionPolicyRequests": {
       "DependsOn": [
         "LambdaExecutionRole"
       ],
-      "Type": "AWS::IAM::Policy",
+      "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
-        "PolicyName": "amplify-lambda-execution-policy-requests",
         "Roles": [
           {
             "Ref": "LambdaExecutionRole"
@@ -344,7 +342,7 @@
     "LambdaEventSourceMappingrequests": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "DependsOn": [
-        "LambdaTriggerPolicyrequests",
+        "AmplifyLambdaExecutionPolicyRequests",
         "LambdaExecutionRole"
       ],
       "Properties": {
@@ -366,13 +364,12 @@
         "StartingPosition": "LATEST"
       }
     },
-    "AmplifyResourcesPolicy": {
+    "AmplifyLambdaExecutionPolicy": {
       "DependsOn": [
         "LambdaExecutionRole"
       ],
-      "Type": "AWS::IAM::Policy",
+      "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
-        "PolicyName": "amplify-lambda-execution-policy",
         "Roles": [
           {
             "Ref": "LambdaExecutionRole"
@@ -494,9 +491,8 @@
       }
     },
     "CustomLambdaExecutionPolicy": {
-      "Type": "AWS::IAM::Policy",
+      "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
-        "PolicyName": "custom-lambda-execution-policy",
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
