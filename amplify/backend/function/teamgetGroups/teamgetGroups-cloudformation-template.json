@@ -52,6 +52,15 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-09a27ebec9fa1e5c6"
+          ],
+          "SubnetIds": [
+            "subnet-0fbb8e6aeb7818c79",
+            "subnet-07ad07b49d72e4e50"
+          ]
+        },
         "Code": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
@@ -127,6 +136,9 @@
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        ],
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
