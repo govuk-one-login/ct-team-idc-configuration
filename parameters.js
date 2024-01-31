@@ -25,10 +25,10 @@ async function update_auth_parameters() {
   oAuthMetadata.CallbackURLs.pop();
   oAuthMetadata.LogoutURLs.pop();
   oAuthMetadata.CallbackURLs.push(
-    `https://${AWS_BRANCH}.${AWS_APP_ID}.amplifyapp.com/`
+    `https://main.team.account.gov.uk/`
   );
   oAuthMetadata.LogoutURLs.push(
-    `https://${AWS_BRANCH}.${AWS_APP_ID}.amplifyapp.com/`
+    `https://main.team.account.gov.uk/`
   );
   authParametersJson.cognitoConfig.oAuthMetadata =
     JSON.stringify(oAuthMetadata);
