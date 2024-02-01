@@ -25,10 +25,10 @@ async function update_auth_parameters() {
   oAuthMetadata.CallbackURLs.pop();
   oAuthMetadata.LogoutURLs.pop();
   oAuthMetadata.CallbackURLs.push(
-    `https://main.team.account.gov.uk/`
+    `https://d3ayajtlmdd5lk.cloudfront.net/`
   );
   oAuthMetadata.LogoutURLs.push(
-    `https://main.team.account.gov.uk/`
+    `https://d3ayajtlmdd5lk.cloudfront.net/`
   );
   authParametersJson.cognitoConfig.oAuthMetadata =
     JSON.stringify(oAuthMetadata);
