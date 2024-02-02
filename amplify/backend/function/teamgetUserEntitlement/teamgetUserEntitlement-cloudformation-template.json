@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.10.1\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -43,6 +43,21 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Fn::ImportValue": "TEAMAmplifyCustomVPCSecurityGroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Fn::ImportValue": "TEAMAmplifyCustomVPCProtectedSubnetIdA"
+            },
+            {
+              "Fn::ImportValue": "TEAMAmplifyCustomVPCProtectedSubnetIdB"
+            }
+          ]
+        },
         "Code": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
@@ -108,6 +123,9 @@
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        ],
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
@@ -244,8 +262,9 @@
       }
     },
     "CustomLambdaExecutionPolicy": {
-      "Type": "AWS::IAM::ManagedPolicy",
+      "Type": "AWS::IAM::Policy",
       "Properties": {
+        "PolicyName": "custom-lambda-execution-policy",
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [

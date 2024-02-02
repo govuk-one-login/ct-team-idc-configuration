@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.10.1\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "deploymentBucketName": {
       "Type": "String"
@@ -54,11 +54,17 @@
       "Properties": {
         "VpcConfig": {
           "SecurityGroupIds": [
-            "sg-09a27ebec9fa1e5c6"
+            {
+              "Fn::ImportValue": "TEAMAmplifyCustomVPCSecurityGroupId"
+            }
           ],
           "SubnetIds": [
-            "subnet-0fbb8e6aeb7818c79",
-            "subnet-07ad07b49d72e4e50"
+            {
+              "Fn::ImportValue": "TEAMAmplifyCustomVPCProtectedSubnetIdA"
+            },
+            {
+              "Fn::ImportValue": "TEAMAmplifyCustomVPCProtectedSubnetIdB"
+            }
           ]
         },
         "Code": {
