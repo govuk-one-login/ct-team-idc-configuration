@@ -41,15 +41,15 @@
         "VpcConfig": {
           "SecurityGroupIds": [
             {
-              "Fn::ImportValue": "plat-3203-vpc-AWSServicesEndpointSecurityGroupId"
+              "Fn::ImportValue": "amplify-vpc-AWSServicesEndpointSecurityGroupId"
             }
           ],
           "SubnetIds": [
             {
-              "Fn::ImportValue": "plat-3203-vpc-ProtectedSubnetIdA"
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdA"
             },
             {
-              "Fn::ImportValue": "plat-3203-vpc-ProtectedSubnetIdB"
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdB"
             }
           ]
         },
