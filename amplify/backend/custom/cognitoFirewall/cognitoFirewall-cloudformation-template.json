@@ -1,0 +1,80 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "authteam06dbb7fcUserPoolId": {
+      "Type": "String",
+      "Description": "Input parameter describing UserPoolId attribute for auth/team06dbb7fc resource"
+    }
+  },
+  "Resources": {
+    "cognitoFirewallAssociation": {
+      "Type" : "AWS::WAFv2::WebACLAssociation",
+      "Properties" : {
+        "ResourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${authteam06dbb7fcUserPoolId}"
+        },
+        "WebACLArn": { 
+          "Fn::GetAtt": ["cognitoFirewall", "Arn"]
+        }
+      }
+    },
+    "cognitoFirewall": {
+      "Type": "AWS::WAFv2::WebACL",
+      "Properties": {
+        "Description": "Web ACL for TEAM Cognito User Pool",
+        "Scope": "REGIONAL",
+        "Name": {
+          "Fn::Sub": "teamCognitoFirewallACL-${env}"
+        },
+        "DefaultAction": {
+          "Block": {}
+        },
+        "VisibilityConfig": {
+          "SampledRequestsEnabled": true,
+          "CloudWatchMetricsEnabled": true,
+          "MetricName": "teamCognitoFirewallACLMetric"
+        },
+        "Rules": [
+          {
+            "Name": "gds-vpn",
+            "Priority": 0,
+            "Action": {
+              "Allow": {}
+            },
+            "Statement": {
+              "IPSetReferenceStatement": {
+                "Arn": {
+                  "Fn::GetAtt": ["gdsVpnIPSet", "Arn"]
+                }
+              }
+            },
+            "OverrideAction": {
+              "None": {}
+            },
+            "VisibilityConfig": {
+              "SampledRequestsEnabled": true,
+              "CloudWatchMetricsEnabled": true,
+              "MetricName": {
+                "Fn::Sub": "teamCognitoFirewall-${env}-vpn-ip-metric"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "gdsVpnIPSet": {
+      "Type": "AWS::WAFv2::IPSet",
+      "Properties": {
+        "Description": "GDS VPN IP addresses",
+        "Name": "gds-vpn",
+        "Scope": "REGIONAL",
+        "IPAddressVersion": "IPV4",
+        "Addresses": ["217.196.229.79", "217.196.229.80", "217.196.229.81", "213.86.153.211/32", "213.86.153.212/32", "213.86.153.213/32", "213.86.153.214/32", "213.86.153.231/32", "213.86.153.235/32", "213.86.153.236/32", "213.86.153.237/32", "51.149.8.0/25", "51.149.8.128/29", "51.149.9.112/29", "51.149.9.240/29"]
+      }
+    } 
+  },
+  "Outputs": {}
+}

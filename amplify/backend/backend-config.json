@@ -100,6 +100,19 @@
       "providerPlugin": "awscloudformation",
       "service": "customCloudformation"
     },
+    "cognitoFirewall": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "team06dbb7fc"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "customCloudformation"
+    },
     "s3bucketSecurity": {
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
