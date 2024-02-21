@@ -98,7 +98,7 @@
             "Name": "gds-vpn",
             "Priority": 0,
             "Action": {
-              "Allow": {}
+              "Block": {}
             },
             "Statement": {
               "IPSetReferenceStatement": {
@@ -111,7 +111,7 @@
               "SampledRequestsEnabled": true,
               "CloudWatchMetricsEnabled": true,
               "MetricName": {
-                "Fn::Sub": "teamCognitoFirewall-${env}-vpn-ip-metric"
+                "Fn::Sub": "teamAppSyncFirewall-${env}-vpn-ip-metric"
               }
             }
           },

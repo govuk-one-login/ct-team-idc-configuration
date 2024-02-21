@@ -82,34 +82,8 @@
       "providerPlugin": "awscloudformation",
       "service": "customCloudformation"
     },
-    "appsyncFirewall": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "GraphQLAPIIdOutput"
-          ],
-          "category": "api",
-          "resourceName": "team"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "customCloudformation"
-    },
     "cloudtrailLake": {
       "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "customCloudformation"
-    },
-    "cognitoFirewall": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "UserPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "team06dbb7fc"
-        }
-      ],
       "providerPlugin": "awscloudformation",
       "service": "customCloudformation"
     },
