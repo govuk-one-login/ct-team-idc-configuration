@@ -134,6 +134,23 @@
           "51.149.8.128/29"
         ]
       }
+    },
+    "vpcNgwIPSet": {
+      "Type": "AWS::WAFv2::IPSet",
+      "Properties": {
+        "Description": "NAT gateways for VPC, used by TEAM lambdas.",
+        "Name": "gds-vpn",
+        "Scope": "REGIONAL",
+        "IPAddressVersion": "IPV4",
+        "Addresses": [
+          {
+            "Fn::ImportValue": "amplify-vpc-NatGatewayZoneAEIP"
+          },
+          {
+            "Fn::ImportValue": "amplify-vpc-NatGatewayZoneBEIP"
+          }
+        ]
+      }
     }
   },
   "Outputs": {}
