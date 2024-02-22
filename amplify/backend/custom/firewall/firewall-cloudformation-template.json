@@ -114,6 +114,27 @@
                 "Fn::Sub": "teamAppSyncFirewall-${env}-vpn-ip-metric"
               }
             }
+          },
+          {
+          "Name": "vpc-ngw",
+            "Priority": 0,
+            "Action": {
+              "Allow": {}
+            },
+            "Statement": {
+              "IPSetReferenceStatement": {
+                "Arn": {
+                  "Fn::GetAtt": ["vpcNgwIPSet", "Arn"]
+                }
+              }
+            },
+            "VisibilityConfig": {
+              "SampledRequestsEnabled": true,
+              "CloudWatchMetricsEnabled": true,
+              "MetricName": {
+                "Fn::Sub": "teamAppSyncFirewall-${env}-ngw-ip-metric"
+              }
+            }
           }
         ]
       }
