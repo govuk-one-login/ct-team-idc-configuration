@@ -160,7 +160,7 @@
       "Type": "AWS::WAFv2::IPSet",
       "Properties": {
         "Description": "NAT gateways for VPC, used by TEAM lambdas.",
-        "Name": "vcp-nwg",
+        "Name": "vcp-ngw",
         "Scope": "REGIONAL",
         "IPAddressVersion": "IPV4",
         "Addresses": [
