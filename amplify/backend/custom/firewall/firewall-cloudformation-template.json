@@ -20,7 +20,7 @@
         "ResourceArn": {
           "Fn::Sub": "arn:${AWS::Partition}:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${authteam06dbb7fcUserPoolId}"
         },
-        "WebACLArn": { 
+        "WebACLArn": {
           "Fn::GetAtt": ["cognitoFirewall", "Arn"]
         }
       }
@@ -31,7 +31,7 @@
         "ResourceArn": {
           "Fn::Sub": "arn:${AWS::Partition}:appsync:${AWS::Region}:${AWS::AccountId}:apis/${apiteamGraphQLAPIIdOutput}"
         },
-        "WebACLArn": { 
+        "WebACLArn": {
           "Fn::GetAtt": ["appSyncFirewall", "Arn"]
         }
       }
@@ -98,7 +98,7 @@
             "Name": "gds-vpn",
             "Priority": 0,
             "Action": {
-              "Block": {}
+              "Allow": {}
             },
             "Statement": {
               "IPSetReferenceStatement": {
