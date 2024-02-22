@@ -164,12 +164,8 @@
         "Scope": "REGIONAL",
         "IPAddressVersion": "IPV4",
         "Addresses": [
-          {
-            "Fn::ImportValue": "amplify-vpc-NatGatewayZoneAEIP"
-          },
-          {
-            "Fn::ImportValue": "amplify-vpc-NatGatewayZoneBEIP"
-          }
+          { "Fn::Join" : [ "", [ {"Fn::ImportValue": "amplify-vpc-NatGatewayZoneAEIP"}, "/32" ] ] },
+          { "Fn::Join" : [ "", [ {"Fn::ImportValue": "amplify-vpc-NatGatewayZoneBEIP"}, "/32" ] ] }
         ]
       }
     }
