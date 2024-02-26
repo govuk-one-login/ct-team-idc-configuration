@@ -95,7 +95,10 @@
         },
         "Runtime": "python3.8",
         "Layers": [],
-        "Timeout": 25
+        "Timeout": 25,
+        "LoggingConfig": {
+          "LogFormat": "JSON"
+        }
       }
     },
     "LambdaExecutionRole": {

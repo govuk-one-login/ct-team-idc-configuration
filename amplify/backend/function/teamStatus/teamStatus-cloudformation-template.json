@@ -109,7 +109,10 @@
         },
         "Runtime": "nodejs18.x",
         "Layers": [],
-        "Timeout": 25
+        "Timeout": 25,
+        "LoggingConfig": {
+          "LogFormat": "JSON"
+        }
       }
     },
     "LambdaExecutionRole": {

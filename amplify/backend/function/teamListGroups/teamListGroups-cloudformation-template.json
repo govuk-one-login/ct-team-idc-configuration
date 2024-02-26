@@ -103,7 +103,10 @@
             "Ref": "functionteamapplicationboto3layerArn"
           }
         ],
-        "Timeout": 120
+        "Timeout": 120,
+        "LoggingConfig": {
+          "LogFormat": "JSON"
+        }
       }
     },
     "LambdaExecutionRole": {
