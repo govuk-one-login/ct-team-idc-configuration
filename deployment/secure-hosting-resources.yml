@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  AmplifyDomainName:
+    Type: String
+    Default: main.d14chojmjvrer1.amplifyapp.com
+    Description: Default domain for Amplify app.
+  HostedZoneId:
+    Type: String
+    Default: Z0635651QX15IRWZX4L8
+    Description: Hosted Zone Id.
+  DomainName:
+    Type: String
+    Default: test.team.account.gov.uk
+    Description: DNS record for application.
+  CloudfrontHostedZoneId:
+    Type: String
+    Default: Z2FDTNDATAQYW2
+    Description: 'Permanent hosted zone for all cloudfront resources: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-aliastarget.html#cfn-route53-aliastarget-hostedzoneid:~:text=Specify-,Z2FDTNDATAQYW2,-.%20This%20is%20always'
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref 'DomainName'
+      DomainValidationOptions:
+        - DomainName: !Ref 'DomainName'
+          HostedZoneId: !Ref 'HostedZoneId'
+      KeyAlgorithm: RSA_2048
+      ValidationMethod: DNS
+  RecordSet:
+    Type: AWS::Route53::RecordSet
+    DependsOn: CloudFrontDistribution
+    Properties:
+      Name: !Ref 'DomainName'
+      Type: CNAME
+      HostedZoneId: !Ref 'HostedZoneId'
+      AliasTarget:
+        DNSName: !GetAtt 'CloudFrontDistribution.DomainName'
+        HostedZoneId: !Ref 'CloudfrontHostedZoneId'
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref 'DomainName'
+        Enabled: true
+        DefaultCacheBehavior:
+          TargetOriginId: !Ref 'AmplifyDomainName'
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+        ViewerCertificate:
+          SslSupportMethod: sni-only
+          AcmCertificateArn: !Ref 'Certificate'
+        Origins:
+          - Id: !Ref 'AmplifyDomainName'
+            DomainName: !Ref 'AmplifyDomainName'
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 30
+              OriginKeepaliveTimeout: 5
+            ConnectionAttempts: 3
+            ConnectionTimeout: 10
+            OriginShield:
+              Enabled: false
+Outputs:
+  r53DomainName:
+    Description: The Domain Name Deployed in Route53.
+    Value: !Ref 'RecordSet'
