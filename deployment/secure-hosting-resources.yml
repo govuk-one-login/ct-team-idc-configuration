@@ -23,7 +23,7 @@ Resources:
     Type: AWS::WAFv2::IPSet
     Properties:
       Description: GDS VPN IP addresses for cloudfront distribution
-      Name: gds-vpn-cloudfront
+      Name: gds-vpn-ip
       Scope: CLOUDFRONT
       IPAddressVersion: IPV4
       Addresses:
