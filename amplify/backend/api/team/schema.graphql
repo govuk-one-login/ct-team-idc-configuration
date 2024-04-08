@@ -67,7 +67,9 @@ type Approvers
   @auth(
     rules: [
       { allow: groups, groups: ["Admin"] }
+      { allow: groups, groupClaim: "scope", groups: ["api/admin"] }
       { allow: private, operations: [read] }
+      { allow: private, provider: iam, operations: [read, update] }
     ]
   ) {
   id: ID
@@ -83,6 +85,7 @@ type Settings
   @auth(
     rules: [
       { allow: groups, groups: ["Admin"] }
+      { allow: groups, groupClaim: "scope", groups: ["api/admin"] }
       { allow: private, operations: [read] }
     ]
   ) {
@@ -115,8 +118,9 @@ type Eligibility
   @auth(
     rules: [
       { allow: groups, groups: ["Admin"] }
+      { allow: groups, groupClaim: "scope", groups: ["api/admin"] }
       { allow: private, operations: [read] }
-      { allow: private, provider: iam, operations: [read] }
+      { allow: private, provider: iam, operations: [read, update] }
     ]
   ) {
   id: ID
