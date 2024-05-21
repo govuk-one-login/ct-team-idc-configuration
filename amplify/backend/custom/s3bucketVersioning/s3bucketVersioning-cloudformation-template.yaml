@@ -6,19 +6,19 @@ Description: >
 Parameters: 
   env: 
     Type: String
-  Environment:
+  tagEnvironment:
     Type: String
     Default: "production"
-  Owner:
+  tagOwner:
     Type: String
     Default: "di-aws-control-tower"
-  Service:
+  tagService:
     Type: String
     Default: "identity-broker"
-  System:
+  tagSystem:
     Type: String
     Default: "control-tower"
-  Product:
+  tagProduct:
     Type: String
     Default: "GOV.UK One Login"
 
@@ -60,15 +60,15 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Tags:
         - Key: Environment
-          Value: !Ref Environment
+          Value: !Ref tagEnvironment
         - Key: Owner
-          Value: !Ref Owner
+          Value: !Ref tagOwner
         - Key: Service
-          Value: !Ref Service
+          Value: !Ref tagService
         - Key: System
-          Value: !Ref System
+          Value: !Ref tagSystem
         - Key: Product
-          Value: !Ref Product
+          Value: !Ref tagProduct
 
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
@@ -77,15 +77,15 @@ Resources:
       Description: 'Lambda function to update the versioning of the amplify hosting bucket'
       Tags:
         - Key: Environment
-          Value: !Ref Environment
+          Value: !Ref tagEnvironment
         - Key: Owner
-          Value: !Ref Owner
+          Value: !Ref tagOwner
         - Key: Service
-          Value: !Ref Service
+          Value: !Ref tagService
         - Key: System
-          Value: !Ref System
+          Value: !Ref tagSystem
         - Key: Product
-          Value: !Ref Product
+          Value: !Ref tagProduct
       Handler: 'index.lambda_handler'
       Environment:
         Variables:
