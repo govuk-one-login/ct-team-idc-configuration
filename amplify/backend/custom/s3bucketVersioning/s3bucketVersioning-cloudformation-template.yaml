@@ -1,0 +1,131 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Pipeline for updating the bucket versioning of the Ammplify hosting bucket
+
+Parameters: 
+  env: 
+    Type: String
+
+Resources:
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub "team-amplify-hostingbucket-lambda-role-${env}"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: S3Permissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                   - "s3:ListAllMyBuckets"
+                   - "s3:PutBucketVersioning"
+                Resource: '*'
+        - PolicyName: LogsPermissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Environment
+          Value: production
+        - Key: Owner
+          Value: di-aws-control-tower
+        - Key: Service
+          Value: identity-broker
+        - Key: System
+          Value: control-tower
+        - Key: Product
+          Value: GOV.UK One Login
+
+  LambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: !Sub "team-amplify-hostingbucket-lambda-${env}"
+      Description: 'Lambda function to update the versioning of the amplify hosting bucket'
+      Tags:
+        - Key: Environment
+          Value: production
+        - Key: Owner
+          Value: di-aws-control-tower
+        - Key: Service
+          Value: identity-broker
+        - Key: System
+          Value: control-tower
+        - Key: Product
+          Value: GOV.UK One Login
+      Handler: 'index.lambda_handler'
+      Environment:
+        Variables:
+          BUCKET_PATTERN: "amplify-.*-hostingbucket"
+      MemorySize: 128
+      Role: !Sub ${LambdaExecutionRole.Arn}
+      Timeout: 30
+      Runtime: python3.9
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import logging
+          import re
+          import os
+          from botocore.config import Config
+
+          # logging
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+                    
+          def lambda_handler(event, context):
+
+            responseData = {}
+            
+            bucket_pattern = os.environ['BUCKET_PATTERN']
+
+            s3 = boto3.client('s3')
+            
+            logger.info(f'{bucket_pattern=}')
+            
+            resp = s3.list_buckets()
+            for bucket in resp['Buckets']:
+              if re.search(bucket_pattern, bucket['Name']):
+                
+                bucket_name = bucket["Name"]
+
+                logger.info(f"Enabling versioning on bucket: {bucket_name}")
+
+                try:
+                  s3.put_bucket_versioning(Bucket=bucket_name,
+                          VersioningConfiguration={
+                              'Status': 'Enabled'
+                      }
+                  )
+                except Exception as e:
+                  logger.error(f"Error occurred: {str(e)}")
+                  responseData['Data'] = "Failure"
+                  cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+
+            responseData['Data'] = "Success"
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+
+  ConfigureAmplifyBucket:
+    Type: Custom::CustomResource
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+      version: '1.0'
