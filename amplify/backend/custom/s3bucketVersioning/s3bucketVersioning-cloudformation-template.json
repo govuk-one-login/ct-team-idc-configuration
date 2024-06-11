@@ -163,7 +163,7 @@
         "Handler": "index.lambda_handler",
         "Environment": {
           "Variables": {
-            "BUCKET_PATTERN": "amplify-.*-hostingbucket"
+            "BUCKET_PATTERN": "amplify-.*-hostingbucket.*"
           }
         },
         "MemorySize": 128,
