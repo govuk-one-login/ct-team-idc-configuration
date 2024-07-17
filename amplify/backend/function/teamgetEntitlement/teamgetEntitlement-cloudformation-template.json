@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.10.1\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -43,21 +43,9 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            {
-              "Fn::ImportValue": "amplify-vpc-AWSServicesEndpointSecurityGroupId"
-            }
-          ],
-          "SubnetIds": [
-            {
-              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdA"
-            },
-            {
-              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdB"
-            }
-          ]
-        },
+        "Architectures": [
+          "arm64"
+        ],
         "Code": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
@@ -70,12 +58,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "teamgetUserEntitlement",
+            "teamgetEntitlement",
             {
               "Fn::Join": [
                 "",
                 [
-                  "teamgetUserEntitlement",
+                  "teamgetEntitlement",
                   "-",
                   {
                     "Ref": "env"
@@ -93,12 +81,7 @@
             "REGION": {
               "Ref": "AWS::Region"
             },
-            "POLICY_TABLE_NAME": {
-              "Fn::ImportValue": {
-                "Fn::Sub": "${apiteamGraphQLAPIIdOutput}:GetAtt:EligibilityTable:Name"
-              }
-            },
-            "API_AWSPIM_GRAPHQLAPIIDOUTPUT": {
+            "API_TEAM_GRAPHQLAPIIDOUTPUT": {
               "Ref": "apiteamGraphQLAPIIdOutput"
             },
             "API_TEAM_GRAPHQLAPIENDPOINTOUTPUT": {
@@ -106,6 +89,11 @@
             },
             "ACCOUNT_ID": {
               "Ref": "AWS::AccountId"
+            },
+            "POLICY_TABLE_NAME": {
+              "Fn::ImportValue": {
+                "Fn::Sub": "${apiteamGraphQLAPIIdOutput}:GetAtt:EligibilityTable:Name"
+              }
             }
           }
         },
@@ -117,27 +105,21 @@
         },
         "Runtime": "python3.9",
         "Layers": [],
-        "Timeout": 120,
-        "LoggingConfig": {
-          "LogFormat": "JSON"
-        }
+        "Timeout": 300
       }
     },
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-        ],
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "teamapplicationLambdaRole9bc77f30",
+            "teamidcappLambdaRole3c74512d",
             {
               "Fn::Join": [
                 "",
                 [
-                  "teamapplicationLambdaRole9bc77f30",
+                  "teamidcappLambdaRole3c74512d",
                   "-",
                   {
                     "Ref": "env"
@@ -165,12 +147,13 @@
         }
       }
     },
-    "LambdaExecutionPolicy": {
+    "lambdaexecutionpolicy": {
       "DependsOn": [
         "LambdaExecutionRole"
       ],
-      "Type": "AWS::IAM::ManagedPolicy",
+      "Type": "AWS::IAM::Policy",
       "Properties": {
+        "PolicyName": "lambda-execution-policy",
         "Roles": [
           {
             "Ref": "LambdaExecutionRole"
@@ -218,12 +201,13 @@
         }
       }
     },
-    "AmplifyLambdaExecutionPolicy": {
+    "AmplifyResourcesPolicy": {
       "DependsOn": [
         "LambdaExecutionRole"
       ],
-      "Type": "AWS::IAM::ManagedPolicy",
+      "Type": "AWS::IAM::Policy",
       "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
         "Roles": [
           {
             "Ref": "LambdaExecutionRole"
@@ -255,6 +239,46 @@
                         "Ref": "apiteamGraphQLAPIIdOutput"
                       },
                       "/types/Query/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:appsync:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":apis/",
+                      {
+                        "Ref": "apiteamGraphQLAPIIdOutput"
+                      },
+                      "/types/Mutation/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:appsync:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":apis/",
+                      {
+                        "Ref": "apiteamGraphQLAPIIdOutput"
+                      },
+                      "/types/Subscription/*"
                     ]
                   ]
                 }

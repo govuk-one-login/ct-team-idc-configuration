@@ -34,11 +34,9 @@ def list_idc_group_membership(groupId):
         print(e.response['Error']['Message'])
         
 def handler(event, context):
-    print(event)
+    
     members = []
     groupIds = event["arguments"]["groupIds"]
     for groupId in groupIds:
-        if members:
-            return {"members": members}
         members.extend(list_idc_group_membership(groupId))
     return {"members": members}

@@ -2,8 +2,9 @@
   "lambdaLayers": [],
   "permissions": {
     "api": {
-      "awspim": [
-        "Query"
+      "team": [
+        "Query",
+        "Mutation"
       ]
     }
   }

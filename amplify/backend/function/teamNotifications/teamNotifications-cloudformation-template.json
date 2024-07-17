@@ -49,6 +49,9 @@
             }
           ]
         },
+        "Architectures": [
+          "arm64"
+        ],
         "Code": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"

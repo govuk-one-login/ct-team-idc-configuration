@@ -93,6 +93,9 @@
             }
           ]
         },
+        "Architectures": [
+          "arm64"
+        ],
         "Code": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
@@ -520,7 +523,8 @@
           "Statement": [
             {
               "Action": [
-                "identitystore:ListUsers"
+                "identitystore:ListUsers",
+                "identitystore:GetUserId"
               ],
               "Resource": [
                 "*"

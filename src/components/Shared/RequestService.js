@@ -20,10 +20,10 @@ import {
   getUsers,
   listEligibilities,
   getEligibility,
-  getEntitlement,
   listGroups,
   getSettings,
-  getMgmtPermissions
+  getMgmtPermissions,
+  getUserPolicy
 } from "../../graphql/queries";
 import {
   createRequests,
@@ -97,6 +97,7 @@ export async function fetchOUs() {
     return data;
   } catch (err) {
     console.log("error fetching OUs");
+    return {"error":err}
   }
 }
 
@@ -233,15 +234,16 @@ export async function fetchLogs(args) {
   }
 }
 
-export async function fetchEntitlement(args) {
+export async function fetchPolicy(args) {
   try {
-    const entitlement = await API.graphql(graphqlOperation(getEntitlement, args));
-    const data = await entitlement.data.getEntitlement;
+    const entitlement = await API.graphql(graphqlOperation(getUserPolicy, args));
+    const data = await entitlement.data.getUserPolicy;
     return data;
   } catch (err) {
     console.log("error fetching Entitlement");
   }
 }
+
 
 // Mutations
 export async function updateStatus(data) {
@@ -409,7 +411,7 @@ export async function getAllEligibility() {
   } while (nextToken);
     return data;
   } catch (err) {
-    console.log("error fetching eligibility", err);
+    console.log("error fetching eligibility");
     return {"error":err}
   }
 }

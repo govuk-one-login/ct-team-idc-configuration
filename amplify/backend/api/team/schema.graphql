@@ -105,7 +105,7 @@ type Settings
   teamAdminGroup: String
   teamAuditorGroup: String
 }
-type data {
+type data @aws_iam @aws_cognito_user_pools {
   name: String
   id: String
 }
@@ -138,12 +138,20 @@ type Accounts {
   name: String!
   id: String!
 }
-type Entitlement {
+type Entitlement @aws_iam @aws_cognito_user_pools {
   accounts: [data]
   permissions: [data]
   approvalRequired: Boolean
   duration: String
 }
+
+input EntitlementInput {
+  accounts: [DataInput]
+  permissions: [DataInput]
+  approvalRequired: Boolean
+  duration: String
+}
+
 type IdCGroups {
   GroupId: String!
   DisplayName: String!
@@ -169,12 +177,6 @@ type Groups {
 type Members {
   members: [String]
 }
-type OUs {
-  Id: String!
-  Arn: String!
-  Name: String!
-  Children:[OUs]
-}
 type Permissions {
   Name: String!
   Arn: String!
@@ -182,6 +184,31 @@ type Permissions {
 }
 type MgmtPs {
   permissions: [String]
+}
+
+type Policy @aws_iam @aws_cognito_user_pools {
+  id: String!
+  policy: [Entitlement]
+}
+
+type OUs @aws_iam @aws_cognito_user_pools {
+  ous: AWSJSON
+}
+
+input PolicyInput {
+  id: String!
+  policy: [EntitlementInput]
+}
+
+input OUsInput {
+  ous: AWSJSON
+}
+
+type Mutation {
+  publishPolicy(result: PolicyInput): Policy
+  @auth(rules: [{ allow: private, provider: iam} { allow: private }])
+  publishOUs(result: OUsInput): OUs
+  @auth(rules: [{ allow: private, provider: iam} { allow: private }])
 }
 
 type Subscription {
@@ -194,12 +221,18 @@ type Subscription {
   onUpdateSessions(id: String): sessions
     @aws_subscribe(mutations: ["updateSessions"])
     @auth(rules: [{ allow: private }])
+  onPublishPolicy: Policy
+    @aws_subscribe(mutations: ["publishPolicy"])
+    @auth(rules: [{ allow: private }])
+  onPublishOUs: OUs
+    @aws_subscribe(mutations: ["publishOUs"])
+    @auth(rules: [{ allow: private }])
 }
 type Query {
   getAccounts: [Accounts]
     @function(name: "teamgetAccounts-${env}")
     @auth(rules: [{ allow: private }])
-  getOUs: [OUs]
+  getOUs: String
     @function(name: "teamgetOUs-${env}")
     @auth(rules: [{ allow: private }])
   getOU(id: String): OU
@@ -225,11 +258,11 @@ type Query {
   ): [Logs]
     @function(name: "teamqueryLogs-${env}")
     @auth(rules: [{ allow: private }])
-  getEntitlement(
+  getUserPolicy(
     userId: String
     groupIds: [String]
-  ): [Entitlement]
-    @function(name: "teamgetUserEntitlement-${env}")
+  ): Policy
+    @function(name: "teamgetUserPolicy-${env}")
     @auth(
     rules: [
       { allow: private, provider: iam}
