@@ -43,6 +43,21 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Fn::ImportValue": "amplify-vpc-AWSServicesEndpointSecurityGroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdA"
+            },
+            {
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdB"
+            }
+          ]
+        },
         "Architectures": [
           "arm64"
         ],
