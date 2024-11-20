@@ -134,10 +134,10 @@
         },
         "LambdaExecutionRole": {
             "Type": "AWS::IAM::Role",
-            "ManagedPolicyArns": [
-                "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-              ],
             "Properties": {
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+                ],
                 "RoleName": {
                     "Fn::If": [
                         "ShouldNotCreateEnvResources",
