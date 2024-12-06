@@ -1,0 +1,174 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "apiteamGraphQLAPIIdOutput": {
+      "Type": "String",
+      "Description": "Input parameter describing GraphQLAPIIdOutput attribute for api/team resource"
+    },
+    "authteam06dbb7fcUserPoolId": {
+      "Type": "String",
+      "Description": "Input parameter describing UserPoolId attribute for auth/team06dbb7fc resource"
+    }
+  },
+  "Resources": {
+    "cognitoFirewallAssociation": {
+      "Type" : "AWS::WAFv2::WebACLAssociation",
+      "Properties" : {
+        "ResourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${authteam06dbb7fcUserPoolId}"
+        },
+        "WebACLArn": {
+          "Fn::GetAtt": ["cognitoFirewall", "Arn"]
+        }
+      }
+    },
+    "appSyncFirewallAssociation": {
+      "Type" : "AWS::WAFv2::WebACLAssociation",
+      "Properties" : {
+        "ResourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:appsync:${AWS::Region}:${AWS::AccountId}:apis/${apiteamGraphQLAPIIdOutput}"
+        },
+        "WebACLArn": {
+          "Fn::GetAtt": ["appSyncFirewall", "Arn"]
+        }
+      }
+    },
+    "cognitoFirewall": {
+      "Type": "AWS::WAFv2::WebACL",
+      "Properties": {
+        "Description": "Web ACL for TEAM Cognito User Pool",
+        "Scope": "REGIONAL",
+        "Name": {
+          "Fn::Sub": "teamCognitoFirewallACL-${env}"
+        },
+        "DefaultAction": {
+          "Block": {}
+        },
+        "VisibilityConfig": {
+          "SampledRequestsEnabled": true,
+          "CloudWatchMetricsEnabled": true,
+          "MetricName": "teamCognitoFirewallACLMetric"
+        },
+        "Rules": [
+          {
+            "Name": "gds-vpn",
+            "Priority": 0,
+            "Action": {
+              "Allow": {}
+            },
+            "Statement": {
+              "IPSetReferenceStatement": {
+                "Arn": {
+                  "Fn::GetAtt": ["gdsVpnIPSet", "Arn"]
+                }
+              }
+            },
+            "VisibilityConfig": {
+              "SampledRequestsEnabled": true,
+              "CloudWatchMetricsEnabled": true,
+              "MetricName": {
+                "Fn::Sub": "teamCognitoFirewall-${env}-vpn-ip-metric"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "appSyncFirewall": {
+      "Type": "AWS::WAFv2::WebACL",
+      "Properties": {
+        "Description": "Web ACL for TEAM AppSync API",
+        "Scope": "REGIONAL",
+        "Name": {
+          "Fn::Sub": "teamAppSyncApiFirewallACL-${env}"
+        },
+        "DefaultAction": {
+          "Block": {}
+        },
+        "VisibilityConfig": {
+          "SampledRequestsEnabled": true,
+          "CloudWatchMetricsEnabled": true,
+          "MetricName": "teamAppSyncApiFirewallACLMetric"
+        },
+        "Rules": [
+          {
+            "Name": "gds-vpn",
+            "Priority": 0,
+            "Action": {
+              "Allow": {}
+            },
+            "Statement": {
+              "IPSetReferenceStatement": {
+                "Arn": {
+                  "Fn::GetAtt": ["gdsVpnIPSet", "Arn"]
+                }
+              }
+            },
+            "VisibilityConfig": {
+              "SampledRequestsEnabled": true,
+              "CloudWatchMetricsEnabled": true,
+              "MetricName": {
+                "Fn::Sub": "teamAppSyncFirewall-${env}-vpn-ip-metric"
+              }
+            }
+          },
+          {
+          "Name": "vpc-ngw",
+            "Priority": 1,
+            "Action": {
+              "Allow": {}
+            },
+            "Statement": {
+              "IPSetReferenceStatement": {
+                "Arn": {
+                  "Fn::GetAtt": ["vpcNgwIPSet", "Arn"]
+                }
+              }
+            },
+            "VisibilityConfig": {
+              "SampledRequestsEnabled": true,
+              "CloudWatchMetricsEnabled": true,
+              "MetricName": {
+                "Fn::Sub": "teamAppSyncFirewall-${env}-ngw-ip-metric"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "gdsVpnIPSet": {
+      "Type": "AWS::WAFv2::IPSet",
+      "Properties": {
+        "Description": "GDS VPN IP addresses",
+        "Name": "gds-vpn",
+        "Scope": "REGIONAL",
+        "IPAddressVersion": "IPV4",
+        "Addresses": [
+          "217.196.229.77/32",
+          "217.196.229.79/32",
+          "217.196.229.80/32",
+          "217.196.229.81/32",
+          "51.149.8.0/25",
+          "51.149.8.128/29"
+        ]
+      }
+    },
+    "vpcNgwIPSet": {
+      "Type": "AWS::WAFv2::IPSet",
+      "Properties": {
+        "Description": "NAT gateways for VPC, used by TEAM lambdas.",
+        "Name": "vcp-ngw",
+        "Scope": "REGIONAL",
+        "IPAddressVersion": "IPV4",
+        "Addresses": [
+          { "Fn::Join" : [ "", [ {"Fn::ImportValue": "amplify-vpc-NatGatewayZoneAEIP"}, "/32" ] ] },
+          { "Fn::Join" : [ "", [ {"Fn::ImportValue": "amplify-vpc-NatGatewayZoneBEIP"}, "/32" ] ] }
+        ]
+      }
+    }
+  },
+  "Outputs": {}
+}

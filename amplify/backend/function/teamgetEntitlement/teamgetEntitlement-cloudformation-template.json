@@ -43,6 +43,21 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Fn::ImportValue": "amplify-vpc-AWSServicesEndpointSecurityGroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdA"
+            },
+            {
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdB"
+            }
+          ]
+        },
         "Architectures": [
           "arm64"
         ],
@@ -111,6 +126,9 @@
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        ],
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",

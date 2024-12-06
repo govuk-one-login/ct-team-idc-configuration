@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"9.2.1\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.10.1\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -35,6 +35,21 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Fn::ImportValue": "amplify-vpc-AWSServicesEndpointSecurityGroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdA"
+            },
+            {
+              "Fn::ImportValue": "amplify-vpc-ProtectedSubnetIdB"
+            }
+          ]
+        },
         "Architectures": [
           "arm64"
         ],
@@ -86,12 +101,18 @@
         },
         "Runtime": "python3.9",
         "Layers": [],
-        "Timeout": 120
+        "Timeout": 120,
+        "LoggingConfig": {
+          "LogFormat": "JSON"
+        }
       }
     },
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        ],
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",

@@ -97,7 +97,32 @@
       "providerPlugin": "awscloudformation",
       "service": "customCloudformation"
     },
+    "firewall": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput"
+          ],
+          "category": "api",
+          "resourceName": "team"
+        },
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "team06dbb7fc"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "customCloudformation"
+    },
     "s3bucketSecurity": {
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "customCloudformation"
+    },
+    "s3bucketVersioning": {
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "customCloudformation"
@@ -399,6 +424,10 @@
     }
   },
   "hosting": {
+    "S3AndCloudFront": {
+      "providerPlugin": "awscloudformation",
+      "service": "S3AndCloudFront"
+    },
     "amplifyhosting": {
       "providerPlugin": "awscloudformation",
       "service": "amplifyhosting",

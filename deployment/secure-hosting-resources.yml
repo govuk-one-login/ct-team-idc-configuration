@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  env:
+    Type: String
+  AmplifyDomainName:
+    Type: String
+    Default: main.d14chojmjvrer1.amplifyapp.com
+    Description: Default domain for Amplify app.
+  HostedZoneId:
+    Type: String
+    Default: Z0635651QX15IRWZX4L8
+    Description: Hosted Zone Id.
+  DomainName:
+    Type: String
+    Default: test.team.account.gov.uk
+    Description: DNS record for application.
+  CloudfrontHostedZoneId:
+    Type: String
+    Default: Z2FDTNDATAQYW2
+    Description: 'Permanent hosted zone for all cloudfront resources: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset-aliastarget.html#cfn-route53-aliastarget-hostedzoneid:~:text=Specify-,Z2FDTNDATAQYW2,-.%20This%20is%20always'
+Resources:
+  gdsVpnIPSet:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Description: GDS VPN IP addresses for cloudfront distribution
+      Name: gds-vpn-ip
+      Scope: CLOUDFRONT
+      IPAddressVersion: IPV4
+      Addresses:
+        - 217.196.229.77/32
+        - 217.196.229.79/32
+        - 217.196.229.80/32
+        - 217.196.229.81/32
+        - 51.149.8.0/25
+        - 51.149.8.128/29
+  CloudfrontFirewall:
+      Type: AWS::WAFv2::WebACL
+      Properties:
+        Description: Web ACL for TEAM Cloudfront Distribution
+        Scope: CLOUDFRONT
+        Name: !Sub 'teamCloudfrontFirewallACL-${env}'
+        DefaultAction:
+          Block: {}
+        VisibilityConfig:
+          SampledRequestsEnabled: true
+          CloudWatchMetricsEnabled: true
+          MetricName: teamCloudfrontFirewallACLMetric
+        Rules:
+          - Name: gds-vpn
+            Priority: 0
+            Action:
+              Allow: {}
+            Statement:
+              IPSetReferenceStatement:
+                Arn: !GetAtt 'gdsVpnIPSet.Arn'
+            VisibilityConfig:
+              SampledRequestsEnabled: true
+              CloudWatchMetricsEnabled: true
+              MetricName: !Sub 'teamCloudfrontFirewall-${env}-vpn-ip-metric'
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref 'DomainName'
+      DomainValidationOptions:
+        - DomainName: !Ref 'DomainName'
+          HostedZoneId: !Ref 'HostedZoneId'
+      KeyAlgorithm: RSA_2048
+      ValidationMethod: DNS
+  RecordSet:
+    Type: AWS::Route53::RecordSet
+    DependsOn: CloudFrontDistribution
+    Properties:
+      Name: !Ref 'DomainName'
+      Type: CNAME
+      HostedZoneId: !Ref 'HostedZoneId'
+      AliasTarget:
+        DNSName: !GetAtt 'CloudFrontDistribution.DomainName'
+        HostedZoneId: !Ref 'CloudfrontHostedZoneId'
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref 'DomainName'
+        Enabled: true
+        DefaultCacheBehavior:
+          TargetOriginId: !Ref 'AmplifyDomainName'
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+        ViewerCertificate:
+          SslSupportMethod: sni-only
+          AcmCertificateArn: !Ref 'Certificate'
+        Origins:
+          - Id: !Ref 'AmplifyDomainName'
+            DomainName: !Ref 'AmplifyDomainName'
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 30
+              OriginKeepaliveTimeout: 5
+            ConnectionAttempts: 3
+            ConnectionTimeout: 10
+            OriginShield:
+              Enabled: false
+        WebACLId: !GetAtt 'CloudfrontFirewall.Arn'
+Outputs:
+  r53DomainName:
+    Description: The Domain Name Deployed in Route53.
+    Value: !Ref 'RecordSet'

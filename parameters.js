@@ -126,7 +126,7 @@ async function update_cloudtrail_parameters() {
   const cloudtrailParametersJson = require(cloudtrailParametersJsonPath);
 
   cloudtrailParametersJson.CloudTrailAuditLogs = CLOUDTRAIL_AUDIT_LOGS;
-  
+
   fs.writeFileSync(
     cloudtrailParametersJsonPath,
     JSON.stringify(cloudtrailParametersJson, null, 4)
@@ -143,7 +143,7 @@ async function update_cloudtrail_parameters() {
   const cloudtrailParametersJson = require(cloudtrailParametersJsonPath);
 
   cloudtrailParametersJson.CloudTrailAuditLogs = CLOUDTRAIL_AUDIT_LOGS;
-  
+
   fs.writeFileSync(
     cloudtrailParametersJsonPath,
     JSON.stringify(cloudtrailParametersJson, null, 4)

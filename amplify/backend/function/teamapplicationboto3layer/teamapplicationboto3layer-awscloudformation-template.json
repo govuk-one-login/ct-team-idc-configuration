@@ -23,20 +23,17 @@
     "LambdaLayerVersionf2146902": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
-        "CompatibleRuntimes": {
-          "Ref": "runtimes"
-        },
+        "CompatibleRuntimes": [
+          "python3.8",
+          "python3.9"
+        ],
         "Content": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
           },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
+          "S3Key": "amplify-builds/teamapplicationboto3layer-LambdaLayerVersion47dd963b-build.zip"
         },
-        "Description": {
-          "Ref": "description"
-        },
+        "Description": "Updated layer version 2024-02-05T11:46:14.540Z",
         "LayerName": {
           "Fn::Sub": [
             "teamapplicationboto3layer-${env}",
